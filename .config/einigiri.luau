@@ -1,0 +1,1 @@
+print("[ERROR] This is the default luau config fallback. Please check if variable CONFIG_PATH in .env file is correctly pointing to your config folder. (The config folder should be .config/einigiri/einigiri.luau)")

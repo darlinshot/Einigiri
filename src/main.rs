@@ -1,7 +1,16 @@
-use std::error::Error;
+mod einigiri;
+mod config;
+fn main() {
+    let msg = einigiri::run();
+    println!("[DEBUG] Einigiri ran complete! Returned with message:\n{:#?}\n[DEBUG END]", msg);
+    //println!("{:#?}", err);
+}
+/*use std::error::Error;
 use mlua::prelude::*;
 use std::fs;
 use std::env;
+use std::path::PathBuf;
+use dirs;
 
 slint::slint! {
     import { Button, VerticalBox } from "std-widgets.slint";
@@ -40,7 +49,19 @@ slint::slint! {
     }
 }
 
+fn get_config_path() -> PathBuf {
+    if let Some(mut config_dir) = dirs::config_dir() {
+        config_dir.push("einigiri");
+        config_dir.push("einigiri.luau");
+        config_dir
+    } else {
+        panic!("Could not find config directory.");
+    }
+}
+
 fn main () -> Result<(), Box<dyn Error>>{
+    let path = get_config_path();
+    println!("{}", path.to_string_lossy());
     let config = "/home/ei/.config/einigiri/einigiri.luau";
 
     let luau = Lua::new();
@@ -65,4 +86,4 @@ fn main () -> Result<(), Box<dyn Error>>{
 
     app.run();
     Ok(())
-}
+}*/

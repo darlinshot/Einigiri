@@ -1,7 +1,7 @@
 print("[DEBUG] Print if you dare")
-local Frame: {any} = require("./classes/Frame")
-_G.UI = {}
+local Frame = require("classes/Frame")
+print(Frame.Name)
 
-print("[DEBUG] Frame: "..Frame.Name)
+--print("[DEBUG] Frame: "..Frame.Name)
 
 

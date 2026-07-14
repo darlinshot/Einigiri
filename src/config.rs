@@ -1,4 +1,3 @@
-use std::env;
 use std::collections::HashMap;
 use dotenvy;
 
@@ -12,8 +11,8 @@ pub fn load_config() -> AppConfig {
     let mut fields = HashMap::new();
     let _ = dotenvy::dotenv().ok();
 
-    if let Ok(envList) = dotenvy::dotenv_iter() {
-        for item in envList {
+    if let Ok(env_list) = dotenvy::dotenv_iter() {
+        for item in env_list{
             if let Ok((i, v)) = item {
                 fields.insert(i, v);
             }

@@ -1,39 +1,33 @@
 use std::error::Error;
-use mlua::prelude::*;
+use std::path::{Path, PathBuf};
 use std::fs;
+use std::env;
+use mlua::prelude::*;
 
 use crate::config;
+use crate::luau_resolver;
 
 pub fn run() -> Result<(), Box<dyn Error>> {
-    let settings = config::load_config();
-    for (i, v) in settings.fields { 
+    let app_config = config::load_config();
+    for (i, v) in &app_config.fields { 
         println!("Key: {} Value: {}", i, v);
     }
-    let projectPath = "";
 
     println!("Running Einigiri!");
 
     let luau = Lua::new();
 
-    /*
-    luau.create_function(move |_, modulePath: String| {
-       let fileName = if modulePath.ends_with(".luau") { fileName }
-       else {
-           format!("{}.luau", modulePath)
-       };
-       let filePath = 
-        
+    let test_fn = luau.create_function(move |ctx, to_print: String| -> Result<(), mlua::Error>{
+        println!("{}", to_print);
         Ok(())
     })?;
-    */
+    luau.globals().set("test", test_fn)?;
 
-    let script = fs::read_to_string("/home/ei/Projects/einigiri/luau/core.luau")?;
-    /*
-    let package: LuaTable = globals.get("package")?;
-    let path: String = package.get("path")?;
-    println!("{}", path);
-    */
-    luau.load(&script)
+    let script_path = PathBuf::from("./luau/core.luau");
+    let src = fs::read_to_string(&script_path)?;
+    let dir = script_path.parent().unwrap_or(Path::new(".")).to_path_buf();
+    luau_resolver::setup_require(&luau, dir);
+    luau.load(&src)
         .exec()?;
 
     Ok(())

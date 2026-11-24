@@ -106,7 +106,7 @@ pub fn setup_require(luau: &Lua, entry_dir: PathBuf) -> mlua::Result<()> {
     let require_fn = luau.create_function(|luau, path: String| {
         resolve_and_run(luau, &path)
     })?;
-    luau.globals().set("require", require_fn);
+    luau.globals().set("require", require_fn)?;
 
     Ok(())
 }

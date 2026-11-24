@@ -7,7 +7,12 @@ use mlua::prelude::*;
 use crate::config;
 use crate::luau_resolver;
 
+use crate::wayland;
+
 pub fn run() -> Result<(), Box<dyn Error>> {
+    let conn = wayland::connect();
+    Ok(())
+    /*
     let app_config = config::load_config();
     for (i, v) in &app_config.fields { 
         println!("Key: {} Value: {}", i, v);
@@ -26,9 +31,10 @@ pub fn run() -> Result<(), Box<dyn Error>> {
     let script_path = PathBuf::from("./luau/core.luau");
     let src = fs::read_to_string(&script_path)?;
     let dir = script_path.parent().unwrap_or(Path::new(".")).to_path_buf();
-    luau_resolver::setup_require(&luau, dir);
+    luau_resolver::setup_require(&luau, dir)?;
     luau.load(&src)
         .exec()?;
 
     Ok(())
+    */
 }

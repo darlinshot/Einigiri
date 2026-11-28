@@ -1,50 +1,81 @@
-use wayland_client::{
+// LIBRARIES 
+use smithay_client_toolkit as sctk;
+use wayland_client as wc;
+
+use sctk::{
+    delegate_registry,
+    delegate_dispatch2,
+
+    registry_handlers,
+    registry::{
+        RegistryState,
+        ProvidesRegistryState,
+    }
+    
+};
+use wc::{
     Connection,
-    Dispatch,
     QueueHandle,
-    globals::{ registry_queue_init, GlobalListContents },
-    protocol::wl_registry,
+    EventQueue,
+    globals::{
+        registry_queue_init
+    },
 };
 
-struct WaylandApp;
+// STRUCTS 
+struct WaylandState {
+    // List of events, and signals new globals added and old globals removed
+    registry_state: RegistryState,
 
-impl Dispatch<wl_registry::WlRegistry, GlobalListContents> for WaylandApp {
-    fn event(
-        state: &mut Self,
-        proxy: &wl_registry::WlRegistry,
-        event: <wl_registry::WlRegistry as wayland_client::Proxy>::Event,
-        data: &GlobalListContents,
-        conn: &Connection,
-        qhandle: &QueueHandle<Self>,
-    )
-    {
-        println!("Holy shit");
-    }
+    // Send object's future events to queue
+    qh: QueueHandle<WaylandState>
+}
+pub struct WaylandApp {
+    connection: Connection,
+    event_queue: EventQueue<WaylandState>,
+    state: WaylandState
 }
 
-pub fn connect() -> Connection {
-    // Connect to Wayland
+// FUNCTIONS 
+fn connect() -> Connection {
     let conn = Connection::connect_to_env()
         .expect("Failed to connect to Wayland.");
 
-    println!("Connected to Wayland.");
-
-    // Discover available protocols
-    let (globals, _event_queues) = registry_queue_init::<WaylandApp>(&conn)
-    .expect("Failed to initialize Wayland registry");
-
-    // DEBUG Print every initialized protocol
-    globals.contents().with_list(
-        |list| {
-            for protocol in list {
-                println!(
-                    "{} (version: {})",
-                    protocol.interface,
-                    protocol.version
-                )
-            } 
-        }
-    );
-
     conn
 }
+
+// IMPLEMENTATIONS
+impl WaylandApp {
+    pub fn new() -> Self {
+        let conn = connect();
+        let (globals, event_queue) = registry_queue_init(&conn)
+        .expect("Failed to register Wayland globals.");
+
+        let qh = event_queue.handle();
+
+        #[allow(unused_mut)]
+        let mut state = WaylandState {
+            registry_state: RegistryState::new(&globals),
+            qh: qh
+        };
+
+        Self {
+            connection: conn,
+            event_queue: event_queue,
+            state: state
+        }
+    }
+} 
+
+// Tells SCTK WaylandState contains RegistryState
+impl ProvidesRegistryState for WaylandState {
+    fn registry(&mut self) -> &mut RegistryState {
+
+        // RegistryState is here
+        &mut self.registry_state
+    }
+    registry_handlers![];
+}
+
+delegate_registry!(WaylandState);
+delegate_dispatch2!(WaylandState);

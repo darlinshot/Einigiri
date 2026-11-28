@@ -10,7 +10,7 @@ use crate::luau_resolver;
 use crate::wayland;
 
 pub fn run() -> Result<(), Box<dyn Error>> {
-    let conn = wayland::connect();
+    let _wayland_app = wayland::WaylandApp::new();
     Ok(())
     /*
     let app_config = config::load_config();
